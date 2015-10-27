@@ -1,0 +1,8 @@
+<queue-entries>
+  <queue>
+    <name>import-menu-queue</name>
+    <rate>20/s</rate>
+    <bucket-size>40</bucket-size>
+    <max-concurrent-requests>1</max-concurrent-requests>
+  </queue>
+</queue-entries>
