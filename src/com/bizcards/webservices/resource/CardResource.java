@@ -69,6 +69,20 @@ public class CardResource extends BaseResource{
 			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<List<CardBean>>(true, "Fetched Card Beans of the User", Status.OK.getStatusCode(), cardBeans));
 	}
 	
+	@GET
+	@Path("/get-shared-cards")
+	public String getSharedCards(@Context HttpServletRequest hh) {
+		String userId = hh.getAttribute(Constants.USER_ID).toString();
+
+		List<CardBean> cardBeans = new ArrayList<CardBean>();
+		cardBeans = CardShareDao.getInstance().getSharedCardsToUserId(userId);
+		
+		if(cardBeans == null || cardBeans.isEmpty())
+			return getNoResultsServerResponse();
+		else 
+			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<List<CardBean>>(true, "Fetched Card Beans of the User", Status.OK.getStatusCode(), cardBeans));
+	}
+	
 	@POST
 	@Path("/add-edit")
 	public String addEditCard(@QueryParam("user_id") String userId, String data){
