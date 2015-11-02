@@ -22,7 +22,7 @@ public class UpdateConverter {
 		if(updateRequired(updated.userFullName))	original.userFullName = updated.userFullName;
 		if(updateRequired(updated.designation))	original.designation = updated.designation;
 		
-		if(updateRequired(updated.imageUrl))	original.imageUrl = updated.imageUrl;
+//		if(updateRequired(updated.imageUrl))	original.imageUrl = updated.imageUrl;
 		if(updateRequired(updated.logoImage))	original.logoImage = updated.logoImage;
 		if(updateRequired(updated.website))	original.website = updated.website;
 		if(updateRequired(updated.fax))	original.fax = updated.fax;

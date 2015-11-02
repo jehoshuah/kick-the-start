@@ -47,7 +47,7 @@ public class CardDao extends BaseDao implements IDao{
 	}
 	
 	public Card getRecord(String cardId){
-		Card card = ofy.query(Card.class).filter("username", cardId).get();
+		Card card = ofy.query(Card.class).filter("id", cardId).get();
 		return card;
 	}
 	

@@ -61,6 +61,13 @@ public class UserDao extends BaseDao implements IDao {
 				.get();
 	}
 	
+	public User getRecordWithUsername(String username){
+		return ofy.query(User.class)
+				.filter("username", username)
+				.filter("isDeleted", false)
+				.get();
+	}
+	
 	public User getRecordWithId(String userId){
 		return ofy.query(User.class)
 				.filter("id", userId)

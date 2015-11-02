@@ -58,7 +58,7 @@ public class CardShareDao {
 		Query<CardShare> query = ofy.query(CardShare.class).filter("receiverId", userId);
 		
 		for (CardShare map: query) {
-			cardBeans.add(BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(map.receiverId)));
+			cardBeans.add(BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(map.cardId)));
 		}
 		return cardBeans;
 	}

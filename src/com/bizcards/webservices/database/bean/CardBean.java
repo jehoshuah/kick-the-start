@@ -11,7 +11,7 @@ public class CardBean implements JsonInterface<Object> {
 	public String id;
 
 	public String userFullName;
-	public String imageUrl;
+//	public String imageUrl;
 	public String userId;
 
 	public String companyName;

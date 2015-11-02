@@ -53,7 +53,7 @@ public class BeanConverter {
 		bean.phone = model.phone;
 		bean.website = model.website;
 		
-		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
+//		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
 		bean.logoImage = StoragePathHelper.getResourceUrlGCS(model.logoImage);
 		
 		bean.isDeleted = model.isDeleted;
@@ -73,7 +73,7 @@ public class BeanConverter {
 		model.phone = bean.phone;
 		model.website = bean.website;
 		
-		model.imageUrl = bean.imageUrl;
+//		model.imageUrl = bean.imageUrl;
 		model.logoImage = bean.logoImage;
 		
 		model.isDeleted = bean.isDeleted;

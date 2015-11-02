@@ -18,7 +18,7 @@ public class Card
 	public String designation;
 	public String fax;
 	
-	public String imageUrl;
+//	public String imageUrl;
 	public String logoImage;
 	public String phone;
 	

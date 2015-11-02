@@ -35,6 +35,16 @@ public class SessionDao extends BaseDao implements IDao {
 		return session != null ? session.username : null;
 	}
 	
+	public String getAccessToken(String username){
+		
+//		String currentTimeString = UniqueIdGenerator.getInstance().getCurrentTime();
+		Session session = ofy.query(Session.class)
+				.filter("username", username)
+//				.filter("validTill >=", currentTimeString )
+				.get();
+		return session != null ? session.accessToken : null;
+	}
+	
 	public String getUserId(String accessToken) {
 		String currentTimeString = UniqueIdGenerator.getInstance().getCurrentTime();
 

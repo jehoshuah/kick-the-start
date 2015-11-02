@@ -22,6 +22,7 @@ import com.bizcards.webservices.database.dao.CardDao;
 import com.bizcards.webservices.database.dao.CardShareDao;
 import com.bizcards.webservices.database.dao.UserDao;
 import com.bizcards.webservices.database.model.Card;
+import com.bizcards.webservices.database.model.User;
 import com.bizcards.webservices.gcm.PNManager;
 import com.bizcards.webservices.json.CommonJsonBuilder;
 import com.bizcards.webservices.utils.Constants;
@@ -85,8 +86,9 @@ public class CardResource extends BaseResource{
 	
 	@POST
 	@Path("/add-edit")
-	public String addEditCard(@QueryParam("user_id") String userId, String data){
-				
+	public String addEditCard(@Context HttpServletRequest hh, String data){
+		String userId = hh.getAttribute(Constants.USER_ID).toString();
+
 		CardBean bean = CommonJsonBuilder.getEntityForJson(data, CardBean.class);
 		
 		Card card;
@@ -124,6 +126,30 @@ public class CardResource extends BaseResource{
 		CardShareDao.getInstance().shareCardToUser(receiverId, senderId, cardId);
 		
 		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiverId, cardId);
+		
+		if(!result)
+			return getUnSuccesfullPushNotificationResponse();
+		
+		return getSuccessfulResponse();
+	}
+	
+	@POST
+	@Path("/share-with-name")
+	public String addCardToUserWithUsername(@Context HttpServletRequest hh, @QueryParam("username") String username, @QueryParam("card_id") String cardId ){
+				
+		String senderId = hh.getAttribute(Constants.USER_ID).toString();
+
+		if(CardDao.getInstance().getRecord(cardId) == null)
+			return getErrorResponse(String.format("No Card found with Id %s", cardId), Status.NO_CONTENT.getStatusCode());
+		
+		User receiver = UserDao.getInstance().getRecordWithUsername(username);
+
+		if(receiver == null)
+			return getErrorResponse(String.format("No User found with Id %s", username), Status.NO_CONTENT.getStatusCode());
+		
+		CardShareDao.getInstance().shareCardToUser(receiver.id, senderId, cardId);
+		
+		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiver.id, cardId);
 		
 		if(!result)
 			return getUnSuccesfullPushNotificationResponse();

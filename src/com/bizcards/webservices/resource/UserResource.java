@@ -160,8 +160,8 @@ public class UserResource extends BaseResource{
 	public String logout(@Context HttpServletRequest hh) {
 
 		String senderId = hh.getAttribute(Constants.USER_ID).toString();
-
-		SessionDao.getInstance().deleteSession(senderId);
+		
+		SessionDao.getInstance().deleteSession(SessionDao.getInstance().getAccessToken(UserDao.getInstance().getRecordWithId(senderId).username));
 		return getSuccessfulResponse();
 	}
 }

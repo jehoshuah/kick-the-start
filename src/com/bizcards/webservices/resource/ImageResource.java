@@ -29,7 +29,7 @@ public class ImageResource extends BaseResource{
 	@Path("/card")
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public String cardUpload(@QueryParam("card_id") String cardId,
-			@FormDataParam("image") InputStream imageInputStream, 
+			//@FormDataParam("image") InputStream imageInputStream, 
 			@FormDataParam("logo") InputStream imageLogoInputStream, 
 			@FormDataParam("type") String type) {
 		Card card = CardDao.getInstance().getRecord(cardId);
@@ -37,25 +37,25 @@ public class ImageResource extends BaseResource{
 		
 		if (card == null)
 			return getErrorResponse(String.format("Invalid userId"), Status.BAD_REQUEST.getStatusCode());
-		if (imageInputStream == null)
-			return getErrorResponse(String.format("image is not specified in form parameters"), Status.BAD_REQUEST.getStatusCode());
+//		if (imageInputStream == null)
+//			return getErrorResponse(String.format("image is not specified in form parameters"), Status.BAD_REQUEST.getStatusCode());
 		if (imageLogoInputStream == null)
 			return getErrorResponse(String.format("logo is not specified in form parameters"), Status.BAD_REQUEST.getStatusCode());
 		
-		String objectImagePath = StoragePathHelper.getCardImagePath(cardId);
+//		String objectImagePath = StoragePathHelper.getCardImagePath(cardId);
 		
 		String objectLogoPath = StoragePathHelper.getCardLogoPath(cardId);
 
-		fileImageUploaded = FileUploadHelperGCS.getInstance().uploadImageFile(imageInputStream, objectImagePath);
+//		fileImageUploaded = FileUploadHelperGCS.getInstance().uploadImageFile(imageInputStream, objectImagePath);
 
 		fileLogoUploaded = FileUploadHelperGCS.getInstance().uploadImageFile(imageLogoInputStream, objectLogoPath);
 
-		if(fileImageUploaded && fileLogoUploaded){			
+		if(fileLogoUploaded){			
 			card.logoImage = objectLogoPath;
-			card.imageUrl = objectImagePath;
+//			card.imageUrl = objectImagePath;
 			CardDao.getInstance().update(cardId, card);
 			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<String>(true, "Image Succesfuly Uploaded", Status.OK.getStatusCode(),
-					StoragePathHelper.getResourceUrlGCS(objectImagePath)));
+					StoragePathHelper.getResourceUrlGCS(objectLogoPath)));
 		} else {
 			return getUnSuccesfullImageResponse();
 		}	

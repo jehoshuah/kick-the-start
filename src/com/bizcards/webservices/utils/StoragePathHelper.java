@@ -14,6 +14,7 @@ public class StoragePathHelper {
 	private static String restaurantUser = "/restaurant-user/";
 	private static String imageFileExtension = ".png";
 	private static String dumpFileExtension = ".bizcards";
+	private static String card = "/card/";
 
 	private static StoragePathHelper instance;
 	
@@ -62,11 +63,11 @@ public class StoragePathHelper {
 	}
 	
 	public static String getCardImagePath(String resourceId) {
-		return String.format("%s%s%s/%s%s", images, restaurant, resourceId, "card-image", imageFileExtension);
+		return String.format("%s%s%s/%s%s", images, card, resourceId, "card-image", imageFileExtension);
 	}
 	
 	public static String getCardLogoPath(String resourceId) {
-		return String.format("%s%s%s/%s%s", images, restaurant, resourceId, "card-logo", imageFileExtension);
+		return String.format("%s%s%s/%s%s", images, card, resourceId, "card-logo", imageFileExtension);
 	}
 
 	public static String getUserImagePath(String resourceId, String type) {

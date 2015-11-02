@@ -59,7 +59,7 @@ public class DummyData {
 		User user = UserDao.getInstance().getRecordWithId(usersMap.get(userMapId));
 		
 		cb.userFullName = user.name;
-		cb.imageUrl = getImageUrl("/product/administrator-icon.png");
+//		cb.imageUrl = getImageUrl("/product/administrator-icon.png");
 		cb.userId = user.id;
 		cb.companyName = companyName;
 		cb.designation = designation;
