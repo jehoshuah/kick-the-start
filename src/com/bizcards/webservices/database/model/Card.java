@@ -21,8 +21,9 @@ public class Card
 //	public String imageUrl;
 	public String logoImage;
 	public String phone;
-	
 	public String website;
+	public String email;
+	
 	public boolean isDeleted;
 
 }

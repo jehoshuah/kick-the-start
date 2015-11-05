@@ -20,4 +20,6 @@ public class CardShare
     public Date sentTime;
 	public Date acceptedTime;
 	public String cardId;
+	
+	public boolean isActive;
 }

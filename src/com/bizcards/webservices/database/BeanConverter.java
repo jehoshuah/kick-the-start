@@ -21,11 +21,13 @@ public class BeanConverter {
 	
 	public CardShareBean getCardShareBean(CardShare model){
 		CardShareBean bean = new CardShareBean();
+		bean.id = model.id;
 		bean.receiverId = model.receiverId;
 		bean.senderId = model.senderId;
 		bean.sentTime = DateTimeConverter.getInstance().getUTCDateString(model.sentTime);
 		bean.acceptedTime = DateTimeConverter.getInstance().getUTCDateString(model.acceptedTime);
 		bean.cardId = model.cardId;
+		bean.isActive = model.isActive;
 		
 		return bean;
 	}
@@ -33,11 +35,13 @@ public class BeanConverter {
 	public CardShare getCardShare(CardShareBean bean) {
 		
 		CardShare model = new CardShare();
+		model.id = bean.id;
 		model.receiverId = bean.receiverId;
 		model.senderId = bean.senderId;
 		model.sentTime = DateTimeConverter.getInstance().getUTCDate(bean.sentTime);
 		model.acceptedTime = DateTimeConverter.getInstance().getUTCDate(bean.acceptedTime);
 		model.cardId = bean.cardId;
+		model.isActive = bean.isActive;
 		
 		return model;
 	}
@@ -52,6 +56,7 @@ public class BeanConverter {
 		bean.fax = model.fax;
 		bean.phone = model.phone;
 		bean.website = model.website;
+		bean.email = model.email;
 		
 //		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
 		bean.logoImage = StoragePathHelper.getResourceUrlGCS(model.logoImage);
@@ -72,6 +77,7 @@ public class BeanConverter {
 		model.fax = bean.fax;
 		model.phone = bean.phone;
 		model.website = bean.website;
+		model.email = bean.email;
 		
 //		model.imageUrl = bean.imageUrl;
 		model.logoImage = bean.logoImage;
@@ -92,7 +98,6 @@ public class BeanConverter {
 		bean.password = model.password;
 		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
 		
-		bean.devicePushNotificationId = model.devicePushNotificationId;
 		bean.isDeleted = model.isDeleted;
 		
 		return bean;
@@ -108,7 +113,6 @@ public class BeanConverter {
 		model.password = bean.password;
 		model.imageUrl = bean.imageUrl;
 		
-		model.devicePushNotificationId = bean.devicePushNotificationId;
 		model.isDeleted = bean.isDeleted;
 		
 		return model;

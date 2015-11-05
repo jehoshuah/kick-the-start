@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 import com.bizcards.webservices.database.BeanConverter;
 import com.bizcards.webservices.database.ServerResponse;
 import com.bizcards.webservices.database.bean.CardBean;
+import com.bizcards.webservices.database.bean.CardShareBean;
 import com.bizcards.webservices.database.dao.CardDao;
 import com.bizcards.webservices.database.dao.CardShareDao;
 import com.bizcards.webservices.database.dao.UserDao;
@@ -26,6 +27,7 @@ import com.bizcards.webservices.database.model.User;
 import com.bizcards.webservices.gcm.PNManager;
 import com.bizcards.webservices.json.CommonJsonBuilder;
 import com.bizcards.webservices.utils.Constants;
+import com.bizcards.webservices.utils.DateTimeConverter;
 
 
 @Path("/card")
@@ -111,31 +113,55 @@ public class CardResource extends BaseResource{
 		}
 	}
 	
-	@POST
-	@Path("/share")
-	public String addCardToUser(@Context HttpServletRequest hh, @QueryParam("receiver_id") String receiverId, @QueryParam("card_id") String cardId ){
-				
-		String senderId = hh.getAttribute(Constants.USER_ID).toString();
-
-		if(CardDao.getInstance().getRecord(cardId) == null)
-			return getErrorResponse(String.format("No Card found with Id %s",receiverId), Status.NO_CONTENT.getStatusCode());
-		
-		if(UserDao.getInstance().getRecordWithId(receiverId) == null)
-			return getErrorResponse(String.format("No User found with Id %s",receiverId), Status.NO_CONTENT.getStatusCode());
-		
-		CardShareDao.getInstance().shareCardToUser(receiverId, senderId, cardId);
-		
-		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiverId, cardId);
-		
-		if(!result)
-			return getUnSuccesfullPushNotificationResponse();
-		
-		return getSuccessfulResponse();
-	}
+//	@POST
+//	@Path("/share")
+//	public String addCardToUser(@Context HttpServletRequest hh, @QueryParam("receiver_id") String receiverId, @QueryParam("card_id") String cardId ){
+//				
+//		String senderId = hh.getAttribute(Constants.USER_ID).toString();
+//
+//		if(CardDao.getInstance().getRecord(cardId) == null)
+//			return getErrorResponse(String.format("No Card found with Id %s",receiverId), Status.NO_CONTENT.getStatusCode());
+//		
+//		if(UserDao.getInstance().getRecordWithId(receiverId) == null)
+//			return getErrorResponse(String.format("No User found with Id %s",receiverId), Status.NO_CONTENT.getStatusCode());
+//		
+//		CardShareDao.getInstance().shareCardToUser(receiverId, senderId, cardId);
+//		
+//		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiverId, cardId);
+//		
+//		if(!result)
+//			return getUnSuccesfullPushNotificationResponse();
+//		
+//		return getSuccessfulResponse();
+//	}
+	
+//	@POST
+//	@Path("/share-with-name")
+//	public String addCardToUserWithUsername(@Context HttpServletRequest hh, @QueryParam("username") String username, @QueryParam("card_id") String cardId ){
+//				
+//		String senderId = hh.getAttribute(Constants.USER_ID).toString();
+//
+//		if(CardDao.getInstance().getRecord(cardId) == null)
+//			return getErrorResponse(String.format("No Card found with Id %s", cardId), Status.NO_CONTENT.getStatusCode());
+//		
+//		User receiver = UserDao.getInstance().getRecordWithUsername(username);
+//
+//		if(receiver == null)
+//			return getErrorResponse(String.format("No User found with name '%s'", username), Status.NO_CONTENT.getStatusCode());
+//		
+//		CardShareDao.getInstance().shareCardToUser(receiver.id, senderId, cardId);
+//		
+//		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiver.id, cardId);
+//		
+//		if(!result)
+//			return getUnSuccesfullPushNotificationResponse();
+//		
+//		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<Object>(false, "Successfully shared card!", Status.OK.getStatusCode(), null));	
+//	}
 	
 	@POST
-	@Path("/share-with-name")
-	public String addCardToUserWithUsername(@Context HttpServletRequest hh, @QueryParam("username") String username, @QueryParam("card_id") String cardId ){
+	@Path("/share")
+	public String sendShareRequest(@Context HttpServletRequest hh, @QueryParam("username") String username, @QueryParam("card_id") String cardId ){
 				
 		String senderId = hh.getAttribute(Constants.USER_ID).toString();
 
@@ -145,16 +171,45 @@ public class CardResource extends BaseResource{
 		User receiver = UserDao.getInstance().getRecordWithUsername(username);
 
 		if(receiver == null)
-			return getErrorResponse(String.format("No User found with Id %s", username), Status.NO_CONTENT.getStatusCode());
-		
-		CardShareDao.getInstance().shareCardToUser(receiver.id, senderId, cardId);
-		
-		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiver.id, cardId);
+			return getErrorResponse(String.format("No User found with name '%s'", username), Status.NO_CONTENT.getStatusCode());
+				
+		String cardShareId = CardShareDao.getInstance().shareCardToUser(receiver.id, senderId, cardId);
+
+		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiver.id, cardId, cardShareId);
 		
 		if(!result)
 			return getUnSuccesfullPushNotificationResponse();
 		
-		return getSuccessfulResponse();
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<Object>(false, "Request Successfully sent!", Status.OK.getStatusCode(), null));	
+	}
+	
+	@POST
+	@Path("/accept")
+	public String addCardToUserWithUsername(@Context HttpServletRequest hh, @QueryParam("card_share_id") String cardShareId){
+				
+		CardShareBean cardShareBean = CardShareDao.getInstance().getCardShareBean(cardShareId);
+		
+		if(cardShareBean == null)
+			return getErrorResponse(String.format("Invalid CardShareId!"), Status.BAD_REQUEST.getStatusCode());
+
+		if(CardDao.getInstance().getRecord(cardShareBean.cardId) == null)
+			return getErrorResponse(String.format("No Card found with Id %s", cardShareBean.cardId), Status.NO_CONTENT.getStatusCode());
+		
+		User sender = UserDao.getInstance().getRecordWithId(cardShareBean.senderId);
+
+		if(sender == null)
+			return getErrorResponse(String.format("No User found with id '%s'", cardShareBean.senderId), Status.NO_CONTENT.getStatusCode());
+		
+		cardShareBean.acceptedTime = DateTimeConverter.getInstance().getUTCTimeStringNow();
+		cardShareBean.isActive = true;
+		CardShareDao.getInstance().update(BeanConverter.getInstance().getCardShare(cardShareBean));
+		
+		boolean result = PNManager.getInstance().notifyCardAccepted(cardShareId);
+		
+		if(!result)
+			return getUnSuccesfullPushNotificationResponse();
+		
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<Object>(false, "Successfully shared card!", Status.OK.getStatusCode(), null));	
 	}
 	
 	@GET

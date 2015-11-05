@@ -18,6 +18,5 @@ public class User
 	public String phone;
 	public String imageUrl;
 	
-	public String devicePushNotificationId;
 	public boolean isDeleted;
 }

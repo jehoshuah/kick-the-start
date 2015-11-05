@@ -53,7 +53,7 @@ public class DummyData {
 		usersMap.put("db", createUserInDb("deepak", "deepak", "Deepak Bandela", "deepak@gendevs.com", "db phone").id);
 	}
 	
-	private CardBean createCardInDb(String userMapId, String companyName, String designation, String fax, String phone, String website){
+	private CardBean createCardInDb(String userMapId, String companyName, String designation, String email, String fax, String phone, String website){
 		CardBean cb = new CardBean();
 		
 		User user = UserDao.getInstance().getRecordWithId(usersMap.get(userMapId));
@@ -65,6 +65,7 @@ public class DummyData {
 		cb.designation = designation;
 		cb.fax = fax;
 		cb.phone = phone;
+		cb.email = email;
 		cb.website = website;
 		
 		cb.logoImage = getImageUrl("/product/administrator-icon.png");
@@ -76,8 +77,8 @@ public class DummyData {
 
 	private void createDummyCards() {
 		
-		createCardInDb("jd", "Joshua Company", "Developer", "joshuad@gendevs.com", "jd phone", "www.jehoshuah.com");
-		createCardInDb("db", "General Developers", "Administrator", "deepak@gendevs.com", "db phone", "www.deepakbandela.com");
+		createCardInDb("jd", "Joshua Company", "Developer", "joshuad@gendevs.com", "1234-123", "jd phone", "www.jehoshuah.com");
+		createCardInDb("db", "General Developers", "Administrator", "deepak@gendevs.com", "1234-123", "db phone", "www.deepakbandela.com");
 	}
 	
 }

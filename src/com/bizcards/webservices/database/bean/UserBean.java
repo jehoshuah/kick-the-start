@@ -12,7 +12,7 @@ public class UserBean implements JsonInterface<Object>{
 	public String email;
 	public String phone;
 	public String imageUrl;
-	
 	public String devicePushNotificationId;
+	
 	public boolean isDeleted;
 }

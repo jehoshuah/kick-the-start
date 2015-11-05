@@ -104,10 +104,13 @@ public class UserResource extends BaseResource{
 		if(ub == null) 
 			return getErrorResponse("Provide Username and Password", Status.NOT_ACCEPTABLE.getStatusCode());
 		
+		if(ub.devicePushNotificationId.isEmpty())
+			return getErrorResponse("Provide devicePushNotificationIds", Status.NOT_ACCEPTABLE.getStatusCode());
+
 		if (!UserDao.getInstance().isAuthorized(ub))
 			return getUnAuthorizedServerResponse();
 		
-		String accessToken = SessionDao.getInstance().createSession(ub.username);
+		String accessToken = SessionDao.getInstance().createSession(ub.username, ub.devicePushNotificationId);
 		
 		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<String>(true,"Login Succesful", Status.OK.getStatusCode(), accessToken));
 	}

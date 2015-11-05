@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bizcards.webservices.database.BeanConverter;
 import com.bizcards.webservices.database.bean.CardBean;
+import com.bizcards.webservices.database.bean.CardShareBean;
 import com.bizcards.webservices.database.bean.UserBean;
 import com.bizcards.webservices.database.model.CardShare;
 import com.bizcards.webservices.utils.DateTimeConverter;
@@ -28,8 +29,16 @@ public class CardShareDao {
 		if (instance == null) instance = new CardShareDao();
 		return instance; 
 	}
+	
+	public boolean update(CardShare cardShare){
+	
+		ofy.put(cardShare);
 		
-	public boolean shareCardToUser(String receiverId, String senderId, String cardId){
+		return true;
+
+	}
+	
+	public String shareCardToUser(String receiverId, String senderId, String cardId){
 		
 		CardShare map = new CardShare();
 		map.id = UniqueIdGenerator.getInstance().getId();
@@ -37,9 +46,16 @@ public class CardShareDao {
 		map.senderId = senderId;
 		map.cardId = cardId;
 		map.sentTime = DateTimeConverter.getInstance().getUTCTimeNow();
+		map.isActive = false;
 		ofy.put(map);
 		
-		return true;
+		return map.id;
+	}
+	
+	public CardShareBean getCardShareBean(String id) {
+		CardShare cardShare = ofy.query(CardShare.class).filter("id", id).get();
+		
+		return BeanConverter.getInstance().getCardShareBean(cardShare);
 	}
 	
 	public List<CardBean> getSharedCardsFromUserId(String userId) {

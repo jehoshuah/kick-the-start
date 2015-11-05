@@ -22,7 +22,8 @@ public class CardBean implements JsonInterface<Object> {
 
 	public String phone;
 	public String website;
-
+	public String email;
+	
 	public boolean isDeleted;
 
 }

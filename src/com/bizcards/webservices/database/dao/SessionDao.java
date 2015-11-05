@@ -1,10 +1,14 @@
 package com.bizcards.webservices.database.dao;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.bizcards.webservices.database.model.Session;
 import com.bizcards.webservices.utils.UniqueIdGenerator;
 import com.googlecode.objectify.Objectify;
 import com.googlecode.objectify.ObjectifyOpts;
 import com.googlecode.objectify.ObjectifyService;
+import com.googlecode.objectify.Query;
 
 public class SessionDao extends BaseDao implements IDao {
 	
@@ -46,18 +50,31 @@ public class SessionDao extends BaseDao implements IDao {
 	}
 	
 	public String getUserId(String accessToken) {
-		String currentTimeString = UniqueIdGenerator.getInstance().getCurrentTime();
+//		String currentTimeString = UniqueIdGenerator.getInstance().getCurrentTime();
 
-        Session session = ofy.query(Session.class).filter("accessToken", accessToken).filter("validTill >=", currentTimeString).get();
+        Session session = ofy.query(Session.class).filter("accessToken", accessToken).get();
 		return session != null ? UserDao.getInstance().getBean(session.username).id : null;
 	}
  
+	public List<String> getDevicePushNotificationId(String username) {
+//		String currentTimeString = UniqueIdGenerator.getInstance().getCurrentTime();
 
-	public String createSession(String username) {
+		List<String> devicePushNotificationIds = new ArrayList<String>();
+        Query<Session> sessions = ofy.query(Session.class).filter("username", username);
+        
+        for (Session session : sessions) {
+        	devicePushNotificationIds.add(session.devicePushNotificationId);
+        }
+        
+		return devicePushNotificationIds;
+	}
+	
+	public String createSession(String username, String devicePushNotificationId) {
 		
 		Session session = new Session();
 		session.accessToken = UniqueIdGenerator.getInstance().getAuthToken();
 		session.username = username;
+		session.devicePushNotificationId = devicePushNotificationId;
 		session.validTill = UniqueIdGenerator.getInstance().getTimeAfter(sessionTimeOut);
 		
 		ofy.put(session);

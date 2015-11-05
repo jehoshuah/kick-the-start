@@ -22,9 +22,9 @@ public class UpdateConverter {
 		if(updateRequired(updated.userFullName))	original.userFullName = updated.userFullName;
 		if(updateRequired(updated.designation))	original.designation = updated.designation;
 		
-//		if(updateRequired(updated.imageUrl))	original.imageUrl = updated.imageUrl;
 		if(updateRequired(updated.logoImage))	original.logoImage = updated.logoImage;
 		if(updateRequired(updated.website))	original.website = updated.website;
+		if(updateRequired(updated.email))	original.email = updated.email;
 		if(updateRequired(updated.fax))	original.fax = updated.fax;
 		if(updateRequired(updated.userId))	original.userId = updated.userId;
 
@@ -37,7 +37,6 @@ public class UpdateConverter {
 		if(updateRequired(updated.phone))	 original.phone = updated.phone;
 		if(updateRequired(updated.email))	 original.email = updated.email;
 		if(updateRequired(updated.imageUrl))	 original.imageUrl = updated.imageUrl;
-		if(updateRequired(updated.devicePushNotificationId)) original.devicePushNotificationId = updated.devicePushNotificationId;
 		
 		return original;
 	}

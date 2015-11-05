@@ -41,7 +41,7 @@ public class SSHttpHelper {
             connection.setDoOutput(true);
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Authorization", "key=AIzaSyDjUXQb1zNi84glae6PBLHpMMI0RBC6YVI");
+            connection.setRequestProperty("Authorization", "key=AIzaSyCOKz-cCG8fRLGKHKrqAsI2pIUD5zGWCAs");
             
             OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
             GDLogger.logInfo("SSHttpHelper", data);

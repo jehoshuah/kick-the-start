@@ -14,4 +14,5 @@ public class Session
     public String username;
     @Indexed
     public String validTill;
+    public String devicePushNotificationId;
 }
