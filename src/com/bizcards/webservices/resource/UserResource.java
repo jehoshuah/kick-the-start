@@ -49,7 +49,7 @@ public class UserResource extends BaseResource{
 		if (UserDao.getInstance().getBean(bean.username) != null)
 			return getErrorResponse("Username already exists. Please select another username", Status.CONFLICT.getStatusCode());
 
-		bean.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(bean.name);
+		bean.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(bean.username);
 
         User user = UserDao.getInstance().add(bean);
         
@@ -117,7 +117,8 @@ public class UserResource extends BaseResource{
 		String accessToken = SessionDao.getInstance().createSession(ub.username, ub.devicePushNotificationId);
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.accessToken = accessToken;
-		loginResponse.userBean = ub;
+		loginResponse.userBean = BeanConverter.getInstance().getUserBean(UserDao.getInstance().getRecordWithUsername(ub.username));
+;
 		
 		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<LoginResponse>(true,"Login Succesful", Status.OK.getStatusCode(), loginResponse));
 	}
