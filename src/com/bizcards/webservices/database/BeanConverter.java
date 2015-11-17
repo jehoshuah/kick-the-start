@@ -2,9 +2,12 @@ package com.bizcards.webservices.database;
 
 import com.bizcards.webservices.database.bean.CardBean;
 import com.bizcards.webservices.database.bean.CardShareBean;
+import com.bizcards.webservices.database.bean.ContactBean;
 import com.bizcards.webservices.database.bean.UserBean;
+import com.bizcards.webservices.database.dao.CardDao;
 import com.bizcards.webservices.database.model.Card;
 import com.bizcards.webservices.database.model.CardShare;
+import com.bizcards.webservices.database.model.Contact;
 import com.bizcards.webservices.database.model.User;
 import com.bizcards.webservices.utils.DateTimeConverter;
 import com.bizcards.webservices.utils.StoragePathHelper;
@@ -50,7 +53,8 @@ public class BeanConverter {
 		CardBean bean = new CardBean();
 
 		bean.id = model.id;
-		bean.userId = model.userId;
+		bean.bizCardCode = model.bizCardCode;
+		bean.companyName = model.companyName;
 		bean.userFullName = model.userFullName;
 		bean.designation = model.designation;
 		bean.fax = model.fax;
@@ -58,8 +62,12 @@ public class BeanConverter {
 		bean.website = model.website;
 		bean.email = model.email;
 		
-//		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
+		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
 		bean.logoImage = StoragePathHelper.getResourceUrlGCS(model.logoImage);
+		
+		bean.isActive = model.isActive;
+		bean.isArchived = model.isArchived;
+		bean.isPrimary = model.isPrimary;
 		
 		bean.isDeleted = model.isDeleted;
 		
@@ -71,7 +79,8 @@ public class BeanConverter {
 		Card model = new Card();
 		
 		model.id = bean.id;
-		model.userId = bean.userId;
+		model.bizCardCode = bean.bizCardCode;
+		model.companyName = bean.companyName;
 		model.userFullName = bean.userFullName;
 		model.designation = bean.designation;
 		model.fax = bean.fax;
@@ -79,14 +88,47 @@ public class BeanConverter {
 		model.website = bean.website;
 		model.email = bean.email;
 		
-//		model.imageUrl = bean.imageUrl;
+		model.imageUrl = bean.imageUrl;
 		model.logoImage = bean.logoImage;
+		
+		model.isActive = bean.isActive;
+		model.isArchived = bean.isArchived;
+		model.isPrimary = bean.isPrimary;
 		
 		model.isDeleted = bean.isDeleted;
 		
 		return model;
 	}
 
+	public ContactBean getContactBean(Contact model) {
+		ContactBean bean = new ContactBean();
+
+		bean.id = model.id;
+		bean.bizCardCode = model.bizCardCode;
+		bean.cardId = model.cardId;
+		bean.cardBean = BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(bean.cardId));
+		bean.type = model.type;
+		bean.notes = model.notes;
+		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
+		bean.isDeleted = model.isDeleted;
+		
+		return bean;
+	}
+
+
+	public Contact getContact(ContactBean bean) {
+		Contact model = new Contact();
+		
+		model.id = bean.id;
+		model.bizCardCode = bean.bizCardCode;
+		model.cardId = bean.cardId;
+		model.type = bean.type;
+		model.notes = bean.notes;
+		model.imageUrl = bean.imageUrl;
+		model.isDeleted = bean.isDeleted;
+		
+		return model;
+	}
 
 	public UserBean getUserBean(User model) {
 		UserBean bean = new UserBean();
@@ -95,8 +137,10 @@ public class BeanConverter {
 		bean.email = model.email;
 		bean.phone = model.phone;
 		bean.username = model.username;
+		bean.bizCardCode = model.bizCardCode;
 		bean.password = model.password;
 		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
+		bean.subscriptionType = model.subscriptionType;
 		
 		bean.isDeleted = model.isDeleted;
 		
@@ -110,8 +154,10 @@ public class BeanConverter {
 		model.email = bean.email;
 		model.phone = bean.phone;
 		model.username = bean.username;
+		model.bizCardCode = bean.bizCardCode;
 		model.password = bean.password;
 		model.imageUrl = bean.imageUrl;
+		model.subscriptionType = bean.subscriptionType;
 		
 		model.isDeleted = bean.isDeleted;
 		

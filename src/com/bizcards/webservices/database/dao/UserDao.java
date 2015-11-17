@@ -75,6 +75,26 @@ public class UserDao extends BaseDao implements IDao {
 				.get();
 	}
 	
+	public String getBizCardCodeWithId(String id) {
+		User user = ofy.query(User.class)
+				.filter("id", id)
+				.get();
+		if (user != null)
+			return user.bizCardCode;
+		else
+			return null;
+	}
+	
+	public String getIdWithBizCardCode(String code) {
+		User user = ofy.query(User.class)
+				.filter("bizCardCode", code)
+				.get();
+		if (user != null)
+			return user.id;
+		else
+			return null;
+	}
+
 	public UserBean getBean(String username){
 		User user = getRecord(username);
 		return user != null ? BeanConverter.getInstance().getUserBean(user) : null;

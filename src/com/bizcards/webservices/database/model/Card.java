@@ -10,19 +10,24 @@ public class Card
 {
     @Id
     public String id;
-    @Indexed
-	public String userId;
+//    @Indexed
+//	public String userId;
+    public String bizCardCode;
     @Indexed
 	public String userFullName;
     public String companyName;
 	public String designation;
 	public String fax;
 	
-//	public String imageUrl;
+	public String imageUrl;
 	public String logoImage;
 	public String phone;
 	public String website;
 	public String email;
+	
+	public boolean isPrimary;
+	public boolean isActive;
+	public boolean isArchived;
 	
 	public boolean isDeleted;
 

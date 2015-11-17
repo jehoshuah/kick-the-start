@@ -15,6 +15,7 @@ public class StoragePathHelper {
 	private static String imageFileExtension = ".png";
 	private static String dumpFileExtension = ".bizcards";
 	private static String card = "/card/";
+	private static String contact = "/contact/";
 
 	private static StoragePathHelper instance;
 	
@@ -64,6 +65,10 @@ public class StoragePathHelper {
 	
 	public static String getCardImagePath(String resourceId) {
 		return String.format("%s%s%s/%s%s", images, card, resourceId, "card-image", imageFileExtension);
+	}
+	
+	public static String getContactImagePath(String resourceId) {
+		return String.format("%s%s%s/%s%s", images, contact, resourceId, "contact-image", imageFileExtension);
 	}
 	
 	public static String getCardLogoPath(String resourceId) {

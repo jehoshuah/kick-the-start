@@ -31,11 +31,8 @@ public class CardShareDao {
 	}
 	
 	public boolean update(CardShare cardShare){
-	
 		ofy.put(cardShare);
-		
 		return true;
-
 	}
 	
 	public String shareCardToUser(String receiverId, String senderId, String cardId){
@@ -60,7 +57,7 @@ public class CardShareDao {
 	
 	public List<CardBean> getSharedCardsFromUserId(String userId) {
 		List<CardBean> cardBeans = new ArrayList<CardBean>();
-		Query<CardShare> query = ofy.query(CardShare.class).filter("senderId", userId);
+		Query<CardShare> query = ofy.query(CardShare.class).filter("senderId", userId).filter("isActive", true);
 		
 		for (CardShare map: query) {
 			cardBeans.add(BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(map.senderId)));
@@ -71,7 +68,7 @@ public class CardShareDao {
 
 	public List<CardBean> getSharedCardsToUserId(String userId) {
 		List<CardBean> cardBeans = new ArrayList<CardBean>();
-		Query<CardShare> query = ofy.query(CardShare.class).filter("receiverId", userId);
+		Query<CardShare> query = ofy.query(CardShare.class).filter("receiverId", userId).filter("isActive", true);
 		
 		for (CardShare map: query) {
 			cardBeans.add(BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(map.cardId)));
@@ -83,7 +80,8 @@ public class CardShareDao {
 		List<UserBean> userBeans = new ArrayList<UserBean>();
 		Query<CardShare> query = ofy.query(CardShare.class)
 				.filter("receiverId", userId)
-				.filter("cardId", cardId);
+				.filter("cardId", cardId)
+				.filter("isActive", true);
 		
 		for (CardShare map: query) {
 			userBeans.add(BeanConverter.getInstance().getUserBean(UserDao.getInstance().getRecordWithId(map.senderId)));
@@ -95,13 +93,21 @@ public class CardShareDao {
 		List<UserBean> userBeans = new ArrayList<UserBean>();
 		Query<CardShare> query = ofy.query(CardShare.class)
 				.filter("senderId", userId)
-				.filter("cardId", cardId);
+				.filter("cardId", cardId)
+				.filter("isActive", true);
 		
 		for (CardShare map: query) {
 			userBeans.add(BeanConverter.getInstance().getUserBean(UserDao.getInstance().getRecordWithId(map.receiverId)));
 		}
 		return userBeans;
 	}
+	
+	public CardShare getCardShareWithReceiverIdAndCardId(String receiverId, String cardId){
+		return ofy.query(CardShare.class)
+				.filter("receiverId", receiverId)
+				.filter("cardId", cardId).get();
+		}
+	
 	
 	public CardShare deletePermanently(String id) {
 		CardShare fetchedObject = ofy.query(CardShare.class).filter("id", id).get();

@@ -3,7 +3,10 @@ package com.bizcards.webservices.gcm;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.bizcards.webservices.database.BeanConverter;
 import com.bizcards.webservices.database.bean.CardShareBean;
+import com.bizcards.webservices.database.bean.UserBean;
+import com.bizcards.webservices.database.dao.CardDao;
 import com.bizcards.webservices.database.dao.CardShareDao;
 import com.bizcards.webservices.database.dao.SessionDao;
 import com.bizcards.webservices.database.dao.UserDao;
@@ -29,6 +32,7 @@ public class PNManager {
 		data.receiverId = receiverId;
 		data.senderId = senderId;
 		data.cardId = cardId;
+		data.card = BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(cardId));
 		data.senderUsername = UserDao.getInstance().getRecordWithId(senderId).username;
 		data.type = PNType.CARD_SHARED;
 		data.cardShareId = cardShareId;
@@ -71,6 +75,66 @@ public class PNManager {
 			devicePushNotificationIds = SessionDao.getInstance().getDevicePushNotificationId(sender.username);
 			
 			if (devicePushNotificationIds != null) {
+				container.registration_ids.addAll(devicePushNotificationIds);
+			}else
+				return false;
+		}
+		
+		PNSender.getInstance().send(container);
+
+		return true;
+	}
+	
+	public boolean notifyCardArchived(String cardId, String senderId) {
+		
+		PNContainer container = new PNContainer();
+		PNData data = new PNData();
+		
+		List<UserBean> receiverBeans = CardShareDao.getInstance().getReceiversWithCardId(senderId, cardId);
+
+		data.cardId = cardId;
+		data.type = PNType.CARD_ARCHIVED;
+		container.data = data;
+
+		List<String> devicePushNotificationIds = new ArrayList<String>();
+		
+		if (receiverBeans != null) {
+
+			for (UserBean userBean : receiverBeans){
+				devicePushNotificationIds.addAll(SessionDao.getInstance().getDevicePushNotificationId(userBean.username));
+			}
+			
+			if (!devicePushNotificationIds.isEmpty()) {
+				container.registration_ids.addAll(devicePushNotificationIds);
+			}else
+				return false;
+		}
+		
+		PNSender.getInstance().send(container);
+
+		return true;
+	}
+
+	public boolean notifyCardUpdated(String cardId, String senderId) {
+		
+		PNContainer container = new PNContainer();
+		PNData data = new PNData();
+		
+		List<UserBean> receiverBeans = CardShareDao.getInstance().getReceiversWithCardId(senderId, cardId);
+
+		data.cardId = cardId;
+		data.type = PNType.CARD_UPDATED;
+		container.data = data;
+
+		List<String> devicePushNotificationIds = new ArrayList<String>();
+		
+		if (receiverBeans != null) {
+
+			for (UserBean userBean : receiverBeans){
+				devicePushNotificationIds.addAll(SessionDao.getInstance().getDevicePushNotificationId(userBean.username));
+			}
+			
+			if (!devicePushNotificationIds.isEmpty()) {
 				container.registration_ids.addAll(devicePushNotificationIds);
 			}else
 				return false;

@@ -23,11 +23,13 @@ import com.bizcards.webservices.database.dao.CardDao;
 import com.bizcards.webservices.database.dao.CardShareDao;
 import com.bizcards.webservices.database.dao.UserDao;
 import com.bizcards.webservices.database.model.Card;
+import com.bizcards.webservices.database.model.CardShare;
 import com.bizcards.webservices.database.model.User;
 import com.bizcards.webservices.gcm.PNManager;
 import com.bizcards.webservices.json.CommonJsonBuilder;
 import com.bizcards.webservices.utils.Constants;
 import com.bizcards.webservices.utils.DateTimeConverter;
+
 
 
 @Path("/card")
@@ -96,7 +98,7 @@ public class CardResource extends BaseResource{
 		Card card;
 		if(bean.id == null){
 
-			bean.userId = userId;
+			bean.bizCardCode = UserDao.getInstance().getBizCardCodeWithId(userId);
 			
 			card = CardDao.getInstance().add(bean);
 
@@ -106,7 +108,14 @@ public class CardResource extends BaseResource{
 			card = BeanConverter.getInstance().getCard(bean);
 
 			card = CardDao.getInstance().update(card.id, card);
-
+			
+			boolean result = false;
+			if (card.isActive) 
+				result = PNManager.getInstance().notifyCardUpdated(card.id, userId);
+			
+			if(!result)
+				return getUnSuccesfullPushNotificationResponse();
+			
 			CardBean cardBean = BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(card.id));
 	
 			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<CardBean>(true, "Succesfully Updated Card", Status.OK.getStatusCode(), cardBean));
@@ -204,18 +213,75 @@ public class CardResource extends BaseResource{
 		cardShareBean.isActive = true;
 		CardShareDao.getInstance().update(BeanConverter.getInstance().getCardShare(cardShareBean));
 		
+		Card card = CardDao.getInstance().getRecord(cardShareBean.cardId);
+		card.isActive = true;
+		CardDao.getInstance().update(card.id, card);
 		boolean result = PNManager.getInstance().notifyCardAccepted(cardShareId);
 		
 		if(!result)
 			return getUnSuccesfullPushNotificationResponse();
 		
-		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<Object>(false, "Successfully shared card!", Status.OK.getStatusCode(), null));	
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<Object>(false, "Successfully Accepted card!", Status.OK.getStatusCode(), null));	
+	}
+	
+	@GET
+	@Path("/make-primary/{id}")
+	public String makePrimary(@PathParam("id") String id) {
+		
+		Card card = CardDao.getInstance().getRecord(id);
+		List<CardBean> userCards = CardDao.getInstance().getCardBeansWithUserId(UserDao.getInstance().getIdWithBizCardCode(card.bizCardCode));
+		for (CardBean cardBean : userCards) {
+			if(cardBean.isPrimary)
+				return getErrorResponse(String.format("Trying to Label Multiple primary cards - Not Allowed"), Status.BAD_REQUEST.getStatusCode());
+		}
+		card.isPrimary = true;
+		CardDao.getInstance().update(id, card);
+		
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<CardBean>(true,"Succesfully made primary!",Status.OK.getStatusCode(),
+				BeanConverter.getInstance().getCardBean(card)));
+
+	}
+	
+	@GET
+	@Path("/archive/{id}")
+	public String archive(@Context HttpServletRequest hh, @PathParam("id") String id) {
+		String senderId = hh.getAttribute(Constants.USER_ID).toString();
+
+		Card card = CardDao.getInstance().getRecord(id);
+		card.isArchived = true;
+		CardDao.getInstance().update(id, card);
+		
+		boolean result = false;
+		
+		if (card.isPrimary) 
+			return getErrorResponse(String.format("Primary Card cannot be archived, please make another existing cards as primary!"), Status.BAD_REQUEST.getStatusCode());
+		
+		if (card.isActive) 
+			result = PNManager.getInstance().notifyCardArchived(id, senderId);
+		
+		if(!result)
+			return getUnSuccesfullPushNotificationResponse();
+
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<CardBean>(true,"Succesfully archived!",Status.OK.getStatusCode(),
+				BeanConverter.getInstance().getCardBean(card)));
+
 	}
 	
 	@GET
 	@Path("/delete/{id}")
-	public String delete(@PathParam("id") String id) {
+	public String delete(@Context HttpServletRequest hh, @PathParam("id") String id) {
 		
+		Card card = CardDao.getInstance().getRecord(id);
+		//own card
+		String userId = hh.getAttribute(Constants.USER_ID).toString();
+		User user = UserDao.getInstance().getRecordWithId(userId);
+		if (user.bizCardCode.equalsIgnoreCase(card.bizCardCode))
+			CardDao.getInstance().delete(id);
+		else {
+			CardShare cardShare = CardShareDao.getInstance().getCardShareWithReceiverIdAndCardId(userId, card.id);
+			CardShareDao.getInstance().deletePermanently(cardShare.id);
+		}
+		//shared card
 		Card deleted = CardDao.getInstance().delete(id);
 
 		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<CardBean>(true,"Succesfully deleted Card",Status.OK.getStatusCode(),
@@ -223,13 +289,13 @@ public class CardResource extends BaseResource{
 
 	}
 	
-	@GET
-	@Path("/delete-permenant/{id}")
-	public String deletePermanent(@PathParam("id") String id) {
-		
-		Card deleted = CardDao.getInstance().deletePermanently(id);
-		
-		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<CardBean>(true,"Succesfully deleted Card",Status.OK.getStatusCode(),
-				BeanConverter.getInstance().getCardBean(deleted)));
-	}
+//	@GET
+//	@Path("/delete-permenant/{id}")
+//	public String deletePermanent(@PathParam("id") String id) {
+//		
+//		Card deleted = CardDao.getInstance().deletePermanently(id);
+//		
+//		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<CardBean>(true,"Succesfully deleted Card",Status.OK.getStatusCode(),
+//				BeanConverter.getInstance().getCardBean(deleted)));
+//	}
 }

@@ -11,8 +11,9 @@ public class CardBean implements JsonInterface<Object> {
 	public String id;
 
 	public String userFullName;
-//	public String imageUrl;
-	public String userId;
+	public String imageUrl;
+//	public String userId;
+    public String bizCardCode;
 
 	public String companyName;
 	public String designation;
@@ -23,6 +24,10 @@ public class CardBean implements JsonInterface<Object> {
 	public String phone;
 	public String website;
 	public String email;
+	
+	public boolean isPrimary;
+	public boolean isActive;
+	public boolean isArchived;
 	
 	public boolean isDeleted;
 

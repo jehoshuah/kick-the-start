@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bizcards.webservices.database.model.Card;
 import com.bizcards.webservices.database.model.CardShare;
+import com.bizcards.webservices.database.model.Contact;
 import com.bizcards.webservices.database.model.User;
 
 
@@ -21,18 +22,31 @@ public class UpdateConverter {
 	
 		if(updateRequired(updated.userFullName))	original.userFullName = updated.userFullName;
 		if(updateRequired(updated.designation))	original.designation = updated.designation;
-		
+		if(updateRequired(updated.imageUrl))	original.imageUrl = updated.imageUrl;
 		if(updateRequired(updated.logoImage))	original.logoImage = updated.logoImage;
 		if(updateRequired(updated.website))	original.website = updated.website;
 		if(updateRequired(updated.email))	original.email = updated.email;
 		if(updateRequired(updated.fax))	original.fax = updated.fax;
-		if(updateRequired(updated.userId))	original.userId = updated.userId;
+		if(updateRequired(updated.bizCardCode))	original.bizCardCode = updated.bizCardCode;
 
 		return original;
 	}
+	
+	public Contact getUpdatedContact(Contact original, Contact updated) {
 
+		if(updateRequired(updated.bizCardCode))	original.bizCardCode = updated.bizCardCode;
+		if(updateRequired(updated.cardId))	original.cardId = updated.cardId;
+		if(updateRequired(updated.type))	original.type = updated.type;
+		if(updateRequired(updated.notes))	original.notes = updated.notes;
+		if(updateRequired(updated.imageUrl))	original.imageUrl = updated.imageUrl;
+
+		return original;
+	}
+	
 	public User getUpdatedUser(User original, User updated) {
 
+		if(updateRequired(updated.subscriptionType))	 original.subscriptionType = updated.subscriptionType;
+		if(updateRequired(updated.bizCardCode))	 original.bizCardCode = updated.bizCardCode;
 		if(updateRequired(updated.name))	 original.name = updated.name;
 		if(updateRequired(updated.phone))	 original.phone = updated.phone;
 		if(updateRequired(updated.email))	 original.email = updated.email;

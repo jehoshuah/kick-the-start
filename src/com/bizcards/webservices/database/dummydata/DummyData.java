@@ -9,8 +9,10 @@ import com.bizcards.webservices.database.bean.UserBean;
 import com.bizcards.webservices.database.dao.CardDao;
 import com.bizcards.webservices.database.dao.UserDao;
 import com.bizcards.webservices.database.model.User;
+import com.bizcards.webservices.database.type.SubscriptionType;
 import com.bizcards.webservices.utils.Constants;
 import com.bizcards.webservices.utils.EncryptDecrypt;
+import com.bizcards.webservices.utils.UniqueIdGenerator;
 
 public class DummyData {
 
@@ -35,11 +37,13 @@ public class DummyData {
 		UserBean ub = new UserBean();
 
 		ub.name = name;
+		ub.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(name, "123");
 		ub.username = username;
 		ub.email = email;
 		ub.phone  = phone;
 		ub.password = EncryptDecrypt.getSha2Hash(password);
 		ub.imageUrl = getImageUrl("/product/administrator-icon.png");
+		ub.subscriptionType = SubscriptionType.FREE;
 		
 		ub = BeanConverter.getInstance().getUserBean(UserDao.getInstance().add(ub));
 		
@@ -60,7 +64,7 @@ public class DummyData {
 		
 		cb.userFullName = user.name;
 //		cb.imageUrl = getImageUrl("/product/administrator-icon.png");
-		cb.userId = user.id;
+		cb.bizCardCode = user.bizCardCode;
 		cb.companyName = companyName;
 		cb.designation = designation;
 		cb.fax = fax;

@@ -12,6 +12,7 @@ public class MyApplication extends Application {
          s.add(CardResource.class);
          s.add(UserResource.class);
          s.add(ImageResource.class);
+         s.add(ContactResource.class);
          return s;
      }
 }

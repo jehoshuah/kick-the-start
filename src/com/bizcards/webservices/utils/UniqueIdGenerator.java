@@ -33,4 +33,8 @@ public class UniqueIdGenerator {
 		return EncryptDecrypt.getSha2Hash(getCurrentTime());
 	}
 	
+	public String getBizCardCode(String name, String number){
+		return String.format("%s.%s", name.toLowerCase(), number);
+	}
+	
 }
