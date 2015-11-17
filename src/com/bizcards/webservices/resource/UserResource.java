@@ -17,12 +17,14 @@ import javax.ws.rs.core.Response.Status;
 import com.bizcards.webservices.database.BeanConverter;
 import com.bizcards.webservices.database.ServerResponse;
 import com.bizcards.webservices.database.bean.ChangePasswordBean;
+import com.bizcards.webservices.database.bean.LoginResponse;
 import com.bizcards.webservices.database.bean.UserBean;
 import com.bizcards.webservices.database.dao.SessionDao;
 import com.bizcards.webservices.database.dao.UserDao;
 import com.bizcards.webservices.database.model.User;
 import com.bizcards.webservices.json.CommonJsonBuilder;
 import com.bizcards.webservices.utils.Constants;
+import com.bizcards.webservices.utils.UniqueIdGenerator;
 
 @Path("/user")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -46,6 +48,8 @@ public class UserResource extends BaseResource{
 
 		if (UserDao.getInstance().getBean(bean.username) != null)
 			return getErrorResponse("Username already exists. Please select another username", Status.CONFLICT.getStatusCode());
+
+		bean.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(bean.name);
 
         User user = UserDao.getInstance().add(bean);
         
@@ -111,8 +115,11 @@ public class UserResource extends BaseResource{
 			return getUnAuthorizedServerResponse();
 		
 		String accessToken = SessionDao.getInstance().createSession(ub.username, ub.devicePushNotificationId);
+		LoginResponse loginResponse = new LoginResponse();
+		loginResponse.accessToken = accessToken;
+		loginResponse.userBean = ub;
 		
-		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<String>(true,"Login Succesful", Status.OK.getStatusCode(), accessToken));
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<LoginResponse>(true,"Login Succesful", Status.OK.getStatusCode(), loginResponse));
 	}
 	
 	@POST
@@ -127,6 +134,7 @@ public class UserResource extends BaseResource{
 			if (UserDao.getInstance().getBean(bean.username) != null)
 				return getErrorResponse("Username already exists. Please select another username", Status.CONFLICT.getStatusCode());
 
+			bean.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(bean.name);
 			user = UserDao.getInstance().add(bean);
 
 			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<UserBean>(true, "Succesfully Added User", Status.OK.getStatusCode(), BeanConverter.getInstance().getUserBean(user)));

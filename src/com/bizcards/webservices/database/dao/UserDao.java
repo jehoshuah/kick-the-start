@@ -85,6 +85,17 @@ public class UserDao extends BaseDao implements IDao {
 			return null;
 	}
 	
+	public User getUserWithBizCardCode(String code) {
+		User user = ofy.query(User.class)
+				.filter("bizCardCode", code)
+				.filter("isDeleted", false)
+				.get();
+		if (user != null)
+			return user;
+		else
+			return null;
+	}
+	
 	public String getIdWithBizCardCode(String code) {
 		User user = ofy.query(User.class)
 				.filter("bizCardCode", code)

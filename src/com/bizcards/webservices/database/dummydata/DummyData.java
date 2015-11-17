@@ -37,7 +37,7 @@ public class DummyData {
 		UserBean ub = new UserBean();
 
 		ub.name = name;
-		ub.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(name, "123");
+		ub.bizCardCode = UniqueIdGenerator.getInstance().getBizCardCode(name);
 		ub.username = username;
 		ub.email = email;
 		ub.phone  = phone;

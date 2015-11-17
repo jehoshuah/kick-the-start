@@ -2,6 +2,9 @@ package com.bizcards.webservices.utils;
 
 import java.util.Date;
 
+import com.bizcards.webservices.database.dao.UserDao;
+import com.bizcards.webservices.database.model.User;
+
 public class UniqueIdGenerator {
 
 	private static UniqueIdGenerator instance;
@@ -33,8 +36,32 @@ public class UniqueIdGenerator {
 		return EncryptDecrypt.getSha2Hash(getCurrentTime());
 	}
 	
-	public String getBizCardCode(String name, String number){
-		return String.format("%s.%s", name.toLowerCase(), number);
+	public String getBizCardCode(String name){
+		String code = String.format("%s.%s", name.toLowerCase(), getHash());
+		boolean duplicate = true;
+		while(duplicate) {
+			User user = UserDao.getInstance().getUserWithBizCardCode(code);
+			if (user == null)
+				duplicate = false;
+		};
+		return code;
 	}
+	
+    public String getHash()
+    {
+        String s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+        String shuffledString = "";
+        while (s.length() != 0)
+        {
+            int index = (int) Math.floor(Math.random() * s.length());
+            char c = s.charAt(index);
+            s = s.substring(0,index)+s.substring(index+1);
+            shuffledString += c;
+        }
+
+        shuffledString = shuffledString.substring(0, Math.min(shuffledString.length(), 5));
+        return shuffledString;
+    }
 	
 }
