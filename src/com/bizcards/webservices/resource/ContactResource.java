@@ -21,6 +21,8 @@ import com.bizcards.webservices.database.bean.ContactBean;
 import com.bizcards.webservices.database.dao.ContactDao;
 import com.bizcards.webservices.database.dao.UserDao;
 import com.bizcards.webservices.database.model.Contact;
+import com.bizcards.webservices.database.model.ContactAdd;
+import com.bizcards.webservices.database.model.User;
 import com.bizcards.webservices.json.CommonJsonBuilder;
 import com.bizcards.webservices.utils.Constants;
 
@@ -58,53 +60,69 @@ public class ContactResource extends BaseResource{
 	public String getUserContacts(@Context HttpServletRequest hh) {
 		String userId = hh.getAttribute(Constants.USER_ID).toString();
 
-		List<ContactBean> contactBeans = new ArrayList<ContactBean>();
-		contactBeans = ContactDao.getInstance().getContactBeansWithUserId(userId);
+		String bizCardCode = UserDao.getInstance().getBizCardCodeWithId(userId);
+		List<ContactAdd> contactAdds = new ArrayList<ContactAdd>();
+		contactAdds = ContactDao.getInstance().getAllUserContactAdds(UserDao.getInstance().getBizCardCodeWithId(userId));
 		
-		if(contactBeans == null || contactBeans.isEmpty())
+		List<ContactBean> contactBeans =  new ArrayList<ContactBean>();
+		
+		if(contactAdds == null || contactAdds.isEmpty())
 			return getNoResultsServerResponse();
-		else 
-			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<List<ContactBean>>(true, "Fetched Contact Beans of the User", Status.OK.getStatusCode(), contactBeans));
+		else {
+			for(ContactAdd contactAdd : contactAdds) {
+				contactBeans.add(BeanConverter.getInstance().getContactBean(ContactDao.getInstance().getContactWithBizCardCode(contactAdd.contactBizCardCode)));
+			}
+		}
+		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<List<ContactBean>>(true, "Fetched Contact Beans of the User", Status.OK.getStatusCode(), contactBeans));
 	}
 	
 	@POST
 	@Path("/add")
-	public String addContact(@Context HttpServletRequest hh, @QueryParam("card_id") String cardId){
+	public String addContact(@Context HttpServletRequest hh, String data){		
 		String userId = hh.getAttribute(Constants.USER_ID).toString();
-		ContactBean contactBean = new ContactBean();
-		contactBean.bizCardCode = UserDao.getInstance().getBizCardCodeWithId(userId);
-		contactBean.cardId = cardId;
-		Contact contact = ContactDao.getInstance().add(contactBean);
+		
+		ContactBean bean = CommonJsonBuilder.getEntityForJson(data, ContactBean.class);
 
+		if (!User.validateBizCardCode(bean.bizCardCode))
+			return getInvalidBizCardCodeResponse();
+		
+		Contact contact = ContactDao.getInstance().getContactWithBizCardCode(bean.bizCardCode);
+
+		ContactAdd contactAdd = new ContactAdd();
+		contactAdd.contactBizCardCode = bean.bizCardCode;
+		contactAdd.userBizCardCode = UserDao.getInstance().getBizCardCodeWithId(userId);
+		
+		contactAdd = ContactDao.getInstance().addContactAdd(contactAdd);
+		
 		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<ContactBean>(true, "Succesfully Added Contact", Status.OK.getStatusCode(), BeanConverter.getInstance().getContactBean(contact)));
 	}
 	
-	@POST
-	@Path("/add-edit")
-	public String addEditContact(@Context HttpServletRequest hh, String data){
-		String userId = hh.getAttribute(Constants.USER_ID).toString();
-
-		ContactBean bean = CommonJsonBuilder.getEntityForJson(data, ContactBean.class);
-		
-		Contact contact;
-		if(bean.id == null){
-
-			bean.bizCardCode = UserDao.getInstance().getBizCardCodeWithId(userId);
-			
-			contact = ContactDao.getInstance().add(bean);
-
-			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<ContactBean>(true, "Succesfully Added Contact", Status.OK.getStatusCode(), BeanConverter.getInstance().getContactBean(contact)));
-		} else {
-			//update record
-			contact = BeanConverter.getInstance().getContact(bean);
-
-			contact = ContactDao.getInstance().update(contact.id, contact);
-
-			ContactBean contactBean = BeanConverter.getInstance().getContactBean(ContactDao.getInstance().getRecord(contact.id));
-	
-			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<ContactBean>(true, "Succesfully Updated Contact", Status.OK.getStatusCode(), contactBean));
-		}	
-	}
+//	@POST
+//	@Path("/add-edit")
+//	public String addEditContact(@Context HttpServletRequest hh, String data){
+//		String userId = hh.getAttribute(Constants.USER_ID).toString();
+//
+//		ContactBean bean = CommonJsonBuilder.getEntityForJson(data, ContactBean.class);
+//		
+//		Contact contact;
+//		if(bean.id == null){
+//
+//			bean.bizCardCode = UserDao.getInstance().getBizCardCodeWithId(userId);
+//			
+//			contact = ContactDao.getInstance().add(bean);
+//
+//			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<ContactBean>(true, "Succesfully Added Contact", Status.OK.getStatusCode(), BeanConverter.getInstance().getContactBean(contact)));
+//		} else {
+//			//update record
+//			contact = BeanConverter.getInstance().getContact(bean);
+//
+//			contact = ContactDao.getInstance().update(contact.id, contact);
+//
+//			ContactBean contactBean = BeanConverter.getInstance().getContactBean(ContactDao.getInstance().getRecord(contact.id));
+//	
+//			return CommonJsonBuilder.getJsonForEntity(new ServerResponse<ContactBean>(true, "Succesfully Updated Contact", Status.OK.getStatusCode(), contactBean));
+//		}	
+//	}
 	
 	@GET
 	@Path("/delete/{id}")

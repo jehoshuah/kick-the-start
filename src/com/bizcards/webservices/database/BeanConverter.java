@@ -4,7 +4,7 @@ import com.bizcards.webservices.database.bean.CardBean;
 import com.bizcards.webservices.database.bean.CardShareBean;
 import com.bizcards.webservices.database.bean.ContactBean;
 import com.bizcards.webservices.database.bean.UserBean;
-import com.bizcards.webservices.database.dao.CardDao;
+import com.bizcards.webservices.database.dao.UserDao;
 import com.bizcards.webservices.database.model.Card;
 import com.bizcards.webservices.database.model.CardShare;
 import com.bizcards.webservices.database.model.Contact;
@@ -105,8 +105,7 @@ public class BeanConverter {
 
 		bean.id = model.id;
 		bean.bizCardCode = model.bizCardCode;
-		bean.cardId = model.cardId;
-		bean.cardBean = BeanConverter.getInstance().getCardBean(CardDao.getInstance().getRecord(bean.cardId));
+		bean.userBean = BeanConverter.getInstance().getUserBean(UserDao.getInstance().getUserWithBizCardCode(model.bizCardCode));
 		bean.type = model.type;
 		bean.notes = model.notes;
 		bean.imageUrl = StoragePathHelper.getResourceUrlGCS(model.imageUrl);
@@ -121,7 +120,6 @@ public class BeanConverter {
 		
 		model.id = bean.id;
 		model.bizCardCode = bean.bizCardCode;
-		model.cardId = bean.cardId;
 		model.type = bean.type;
 		model.notes = bean.notes;
 		model.imageUrl = bean.imageUrl;

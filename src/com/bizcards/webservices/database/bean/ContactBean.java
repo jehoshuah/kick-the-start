@@ -6,12 +6,9 @@ public class ContactBean  implements JsonInterface<Object> {
 	
 		public String id;
 
-//		public String userId;
 	    public String bizCardCode;
-
-		public String cardId;
-		public CardBean cardBean;
 	    public String type;// see ContactType
+	    public UserBean userBean;
 	    
 	    public String notes;
 	    public String imageUrl;

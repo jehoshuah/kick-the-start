@@ -64,9 +64,10 @@ public class CardResource extends BaseResource{
 	@Path("/get-user-cards")
 	public String getUserCards(@Context HttpServletRequest hh) {
 		String userId = hh.getAttribute(Constants.USER_ID).toString();
-
+		User user = UserDao.getInstance().getRecordWithId(userId);
+		
 		List<CardBean> cardBeans = new ArrayList<CardBean>();
-		cardBeans = CardDao.getInstance().getCardBeansWithUserId(userId);
+		cardBeans = CardDao.getInstance().getCardBeansWithBizCardCode(user.bizCardCode);
 		
 		if(cardBeans == null || cardBeans.isEmpty())
 			return getNoResultsServerResponse();
@@ -106,7 +107,13 @@ public class CardResource extends BaseResource{
 		} else {
 			//update record
 			card = BeanConverter.getInstance().getCard(bean);
+			Card original = CardDao.getInstance().getRecord(bean.id);
 
+			//cant change these during edit
+			card.isActive = original.isActive;
+			card.isArchived = original.isArchived;
+			card.isPrimary = original.isPrimary;
+			
 			card = CardDao.getInstance().update(card.id, card);
 			
 			boolean result = false;
@@ -130,6 +137,9 @@ public class CardResource extends BaseResource{
 
 		if(CardDao.getInstance().getRecord(cardId) == null)
 			return getErrorResponse(String.format("No Card found with Id %s", cardId), Status.NO_CONTENT.getStatusCode());
+		
+		if (!User.validateBizCardCode(bizCardCode))
+			return getInvalidBizCardCodeResponse();
 		
 		User receiver = UserDao.getInstance().getUserWithBizCardCode(bizCardCode);
 
@@ -183,11 +193,11 @@ public class CardResource extends BaseResource{
 	public String makePrimary(@PathParam("id") String id) {
 		
 		Card card = CardDao.getInstance().getRecord(id);
-		List<CardBean> userCards = CardDao.getInstance().getCardBeansWithUserId(UserDao.getInstance().getIdWithBizCardCode(card.bizCardCode));
-		for (CardBean cardBean : userCards) {
-			if(cardBean.isPrimary)
-				return getErrorResponse(String.format("Trying to Label Multiple primary cards - Not Allowed"), Status.BAD_REQUEST.getStatusCode());
-		}
+
+		Card primaryCard = CardDao.getInstance().getPrimaryCardWithBizCardCode(card.bizCardCode);
+		primaryCard.isPrimary = false;
+		CardDao.getInstance().update(card.id, primaryCard);
+		
 		card.isPrimary = true;
 		CardDao.getInstance().update(id, card);
 		
@@ -212,6 +222,8 @@ public class CardResource extends BaseResource{
 		
 		if (card.isActive) 
 			result = PNManager.getInstance().notifyCardArchived(id, senderId);
+		else
+			result = true;
 		
 		if(!result)
 			return getUnSuccesfullPushNotificationResponse();

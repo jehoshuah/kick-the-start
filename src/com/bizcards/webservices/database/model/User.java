@@ -2,6 +2,7 @@ package com.bizcards.webservices.database.model;
 
 import javax.persistence.Id;
 
+import com.bizcards.webservices.database.dao.UserDao;
 import com.googlecode.objectify.annotation.Cached;
 import com.googlecode.objectify.annotation.Indexed;
 
@@ -22,4 +23,10 @@ public class User
 	
 	public String subscriptionType;// see SubscriptionType
 	public boolean isDeleted;
+	
+	public static boolean validateBizCardCode(String bizCardCode) {
+		if(UserDao.getInstance().getUserWithBizCardCode(bizCardCode) == null)
+			return false;
+		return true;
+	}
 }

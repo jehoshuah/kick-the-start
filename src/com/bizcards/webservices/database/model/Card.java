@@ -10,8 +10,7 @@ public class Card
 {
     @Id
     public String id;
-//    @Indexed
-//	public String userId;
+
     public String bizCardCode;
     @Indexed
 	public String userFullName;

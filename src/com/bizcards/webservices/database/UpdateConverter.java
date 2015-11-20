@@ -27,6 +27,9 @@ public class UpdateConverter {
 		if(updateRequired(updated.website))	original.website = updated.website;
 		if(updateRequired(updated.email))	original.email = updated.email;
 		if(updateRequired(updated.fax))	original.fax = updated.fax;
+		if(updateRequired(original.isActive, updated.isActive))	original.isActive = updated.isActive;
+		if(updateRequired(original.isArchived, updated.isArchived))	original.isArchived = updated.isArchived;
+		if(updateRequired(original.isPrimary, updated.isPrimary))	original.isPrimary = updated.isPrimary;
 		if(updateRequired(updated.bizCardCode))	original.bizCardCode = updated.bizCardCode;
 
 		return original;
@@ -35,7 +38,6 @@ public class UpdateConverter {
 	public Contact getUpdatedContact(Contact original, Contact updated) {
 
 		if(updateRequired(updated.bizCardCode))	original.bizCardCode = updated.bizCardCode;
-		if(updateRequired(updated.cardId))	original.cardId = updated.cardId;
 		if(updateRequired(updated.type))	original.type = updated.type;
 		if(updateRequired(updated.notes))	original.notes = updated.notes;
 		if(updateRequired(updated.imageUrl))	original.imageUrl = updated.imageUrl;

@@ -40,6 +40,11 @@ public class BaseResource {
 		return CommonJsonBuilder.getJsonForEntity(error);
 	}
 	
+	public String getInvalidBizCardCodeResponse(){
+		ServerResponse<Object> error = new ServerResponse<Object>(false, "Invalid BizCardCode", 400, null);
+		return CommonJsonBuilder.getJsonForEntity(error);
+	}
+	
 	public String getSuccesfullyAddedServerResponse(){
 		ServerResponse<Object> error = new ServerResponse<Object>(true, "Record added succesfully", 201, null);
 		return CommonJsonBuilder.getJsonForEntity(error);

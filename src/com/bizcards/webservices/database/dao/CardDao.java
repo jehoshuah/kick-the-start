@@ -21,17 +21,29 @@ public class CardDao extends BaseDao implements IDao{
 		ObjectifyService.register(Card.class);		
 	}
 
-	public List<CardBean> getCardBeansWithUserId(String userId){
+	public List<CardBean> getCardBeansWithBizCardCode(String bizCardCode){
 		List<CardBean> cardBeans = new ArrayList<CardBean>();
 		
 		Query<Card> query = ofy.query(Card.class)
-				.filter("userId", userId)
+				.filter("bizCardCode", bizCardCode)
 				.filter("isDeleted", false);
 		if(query == null) return null;
 		for(Card card : query) {
 			cardBeans.add(BeanConverter.getInstance().getCardBean(card));
 		}
 		return cardBeans;
+	}
+	
+	public Card getPrimaryCardWithBizCardCode(String bizCardCode){
+		
+		Card card = ofy.query(Card.class)
+				.filter("bizCardCode", bizCardCode)
+				.filter("isPrimary", true)
+				.filter("isDeleted", false).get();
+		
+		if(card == null) return null;
+
+		return card;
 	}
 	
 	public List<CardBean> getAllCards(){
