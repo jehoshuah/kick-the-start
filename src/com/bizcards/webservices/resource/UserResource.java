@@ -88,7 +88,6 @@ public class UserResource extends BaseResource{
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.accessToken = accessToken;
 		loginResponse.userBean = BeanConverter.getInstance().getUserBean(UserDao.getInstance().getRecordWithUsername(ub.username));
-;
 		
 		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<LoginResponse>(true,"Login Succesful", Status.OK.getStatusCode(), loginResponse));
 	}
