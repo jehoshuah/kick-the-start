@@ -56,7 +56,7 @@ public class SessionDao extends BaseDao implements IDao {
 		return session != null ? UserDao.getInstance().getBean(session.username).id : null;
 	}
  
-	public List<String> getDevicePushNotificationId(String username) {
+	public List<String> getDevicePushNotificationIds(String username) {
 //		String currentTimeString = UniqueIdGenerator.getInstance().getCurrentTime();
 
 		List<String> devicePushNotificationIds = new ArrayList<String>();

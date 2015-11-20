@@ -34,13 +34,6 @@ public class UserResource extends BaseResource{
 	@POST
 	@Path("/sign-up")
 	public String createNewUser(String data) {
-
-//      bean.password = UniqueIdGenerator.getInstance().getUniqueToken().substring(0,6);
-//
-//		bean = createName(bean);
-        
-//		if (!sendMail(bean))
-//			return Response.status(Status.BAD_REQUEST).entity(new ResponseMessage("Registration Failed/ Password not sent to username/email")).build();
 		
 		UserBean bean = CommonJsonBuilder.getEntityForJson(data, UserBean.class);
 		if(bean == null)
@@ -55,29 +48,6 @@ public class UserResource extends BaseResource{
         
 		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<User>(true,"Succesfully created user",200, user));
 	}
-
-//	public boolean validateEmailFormat(UserBean userBean) {
-//		String EMAIL_PATTERN = 
-//			"^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-//			+ "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$";
-//		
-//		Pattern pattern = Pattern.compile(EMAIL_PATTERN);
-//		Matcher matcher = pattern.matcher(userBean.username);
-//		
-//		return matcher.matches();
-//	}
-//	
-//	public UserBean createName(UserBean bean) {
-//		if (bean.name == null) 
-//			bean.name = bean.username.substring(0, bean.username.indexOf('@'));	
-//		return bean;
-//	}
-	
-//	public boolean sendMail(UserBean bean) {
-//        
-//        new MailHelper().welcomeEmail(UserDao.getInstance().getMailReceiver(bean));
-//        return true;
-//    }
 	
 	@GET
 	@Path("/get")

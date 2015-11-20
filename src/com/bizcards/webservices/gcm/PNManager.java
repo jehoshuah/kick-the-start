@@ -42,7 +42,7 @@ public class PNManager {
 		List<String> devicePushNotificationIds = new ArrayList<String>();
 		
 		if (receiver != null) {
-			devicePushNotificationIds = SessionDao.getInstance().getDevicePushNotificationId(receiver.username);
+			devicePushNotificationIds = SessionDao.getInstance().getDevicePushNotificationIds(receiver.username);
 
 			if (devicePushNotificationIds != null) {
 				container.registration_ids.addAll(devicePushNotificationIds );
@@ -72,7 +72,7 @@ public class PNManager {
 		List<String> devicePushNotificationIds = new ArrayList<String>();
 
 		if (sender != null) {
-			devicePushNotificationIds = SessionDao.getInstance().getDevicePushNotificationId(sender.username);
+			devicePushNotificationIds = SessionDao.getInstance().getDevicePushNotificationIds(sender.username);
 			
 			if (devicePushNotificationIds != null) {
 				container.registration_ids.addAll(devicePushNotificationIds);
@@ -98,16 +98,13 @@ public class PNManager {
 
 		List<String> devicePushNotificationIds = new ArrayList<String>();
 		
-		if (receiverBeans != null) {
+		if (receiverBeans != null && !receiverBeans.isEmpty()) {
 
-			for (UserBean userBean : receiverBeans){
-				devicePushNotificationIds.addAll(SessionDao.getInstance().getDevicePushNotificationId(userBean.username));
-			}
+			for (UserBean userBean : receiverBeans)
+				devicePushNotificationIds.addAll(SessionDao.getInstance().getDevicePushNotificationIds(userBean.username));
 			
-			if (!devicePushNotificationIds.isEmpty()) {
+			if (!devicePushNotificationIds.isEmpty() && devicePushNotificationIds != null)
 				container.registration_ids.addAll(devicePushNotificationIds);
-			}else
-				return false;
 		}
 		
 		PNSender.getInstance().send(container);
@@ -131,7 +128,7 @@ public class PNManager {
 		if (receiverBeans != null) {
 
 			for (UserBean userBean : receiverBeans){
-				devicePushNotificationIds.addAll(SessionDao.getInstance().getDevicePushNotificationId(userBean.username));
+				devicePushNotificationIds.addAll(SessionDao.getInstance().getDevicePushNotificationIds(userBean.username));
 			}
 			
 			if (!devicePushNotificationIds.isEmpty()) {

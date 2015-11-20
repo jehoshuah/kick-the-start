@@ -122,65 +122,19 @@ public class CardResource extends BaseResource{
 		}
 	}
 	
-//	@POST
-//	@Path("/share")
-//	public String addCardToUser(@Context HttpServletRequest hh, @QueryParam("receiver_id") String receiverId, @QueryParam("card_id") String cardId ){
-//				
-//		String senderId = hh.getAttribute(Constants.USER_ID).toString();
-//
-//		if(CardDao.getInstance().getRecord(cardId) == null)
-//			return getErrorResponse(String.format("No Card found with Id %s",receiverId), Status.NO_CONTENT.getStatusCode());
-//		
-//		if(UserDao.getInstance().getRecordWithId(receiverId) == null)
-//			return getErrorResponse(String.format("No User found with Id %s",receiverId), Status.NO_CONTENT.getStatusCode());
-//		
-//		CardShareDao.getInstance().shareCardToUser(receiverId, senderId, cardId);
-//		
-//		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiverId, cardId);
-//		
-//		if(!result)
-//			return getUnSuccesfullPushNotificationResponse();
-//		
-//		return getSuccessfulResponse();
-//	}
-	
-//	@POST
-//	@Path("/share-with-name")
-//	public String addCardToUserWithUsername(@Context HttpServletRequest hh, @QueryParam("username") String username, @QueryParam("card_id") String cardId ){
-//				
-//		String senderId = hh.getAttribute(Constants.USER_ID).toString();
-//
-//		if(CardDao.getInstance().getRecord(cardId) == null)
-//			return getErrorResponse(String.format("No Card found with Id %s", cardId), Status.NO_CONTENT.getStatusCode());
-//		
-//		User receiver = UserDao.getInstance().getRecordWithUsername(username);
-//
-//		if(receiver == null)
-//			return getErrorResponse(String.format("No User found with name '%s'", username), Status.NO_CONTENT.getStatusCode());
-//		
-//		CardShareDao.getInstance().shareCardToUser(receiver.id, senderId, cardId);
-//		
-//		boolean result = PNManager.getInstance().notifyCardShare(senderId, receiver.id, cardId);
-//		
-//		if(!result)
-//			return getUnSuccesfullPushNotificationResponse();
-//		
-//		return CommonJsonBuilder.getJsonForEntity(new ServerResponse<Object>(false, "Successfully shared card!", Status.OK.getStatusCode(), null));	
-//	}
-	
 	@POST
 	@Path("/share")
-	public String sendShareRequest(@Context HttpServletRequest hh, @QueryParam("username") String username, @QueryParam("card_id") String cardId ){
+	public String sendShareRequest(@Context HttpServletRequest hh, @QueryParam("biz-card-code") String bizCardCode, @QueryParam("card_id") String cardId ){
 				
 		String senderId = hh.getAttribute(Constants.USER_ID).toString();
 
 		if(CardDao.getInstance().getRecord(cardId) == null)
 			return getErrorResponse(String.format("No Card found with Id %s", cardId), Status.NO_CONTENT.getStatusCode());
 		
-		User receiver = UserDao.getInstance().getRecordWithUsername(username);
+		User receiver = UserDao.getInstance().getUserWithBizCardCode(bizCardCode);
 
 		if(receiver == null)
-			return getErrorResponse(String.format("No User found with name '%s'", username), Status.NO_CONTENT.getStatusCode());
+			return getErrorResponse(String.format("No User found with code '%s'", bizCardCode), Status.NO_CONTENT.getStatusCode());
 				
 		String cardShareId = CardShareDao.getInstance().shareCardToUser(receiver.id, senderId, cardId);
 

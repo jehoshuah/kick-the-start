@@ -97,7 +97,8 @@ public class CardShareDao {
 				.filter("isActive", true);
 		
 		for (CardShare map: query) {
-			userBeans.add(BeanConverter.getInstance().getUserBean(UserDao.getInstance().getRecordWithId(map.receiverId)));
+			if (map.acceptedTime != null)
+				userBeans.add(BeanConverter.getInstance().getUserBean(UserDao.getInstance().getRecordWithId(map.receiverId)));
 		}
 		return userBeans;
 	}
